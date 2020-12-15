@@ -62,22 +62,21 @@ class PressesParser extends Command
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $tournament = Tournament::where([
-                ['name', trim($e->plaintext)],
-                ['status', self::KIND_CHAMP]
-            ])
-                ->first();
-
-            if ($tournament === null) {
-                $tournament = new Tournament();
-                $tournament->name = trim($e->plaintext);
-                $tournament->status = self::KIND_CHAMP;
-                $tournament->save();
-            }
-
             $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/schedule');
 
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
+
+            $nameRegularChamp = trim($domRegularChamp->find('h2', 0)->plaintext);
+
+            $tournament = Tournament::where([
+                    ['name', $nameRegularChamp],
+                    ['status', self::KIND_CHAMP]
+                ])
+                ->first();
+
+            if (!$tournament) {
+                continue;
+            }
 
             foreach ($domRegularChamp->find('div[class="col col50"]') as $elRegularChamp) {
 //                sleep(rand(0,3));
@@ -217,7 +216,6 @@ class PressesParser extends Command
                     }
                 }
             }
-            print_r('ended work with:' . trim($e->plaintext) . PHP_EOL);
         }
     }
 }
