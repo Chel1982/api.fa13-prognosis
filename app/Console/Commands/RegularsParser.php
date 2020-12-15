@@ -194,7 +194,6 @@ class RegularsParser extends Command
                     }
                 }
             }
-            print_r('ended work with:' . trim($e->plaintext) . PHP_EOL);
         }
     }
 }
