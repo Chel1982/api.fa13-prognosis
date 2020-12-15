@@ -7,6 +7,7 @@ use App\Models\PressConference;
 use App\Models\Season;
 use App\Models\Team;
 use App\Models\Tournament;
+use DateTime;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
 
@@ -141,23 +142,28 @@ class PressesParser extends Command
                     $pressHtml = file_get_contents(self::URL_FA13 . $hrefPress);
                     $pressDom = HtmlDomParser::str_get_html($pressHtml);
 
+                    $date = trim($pressDom->find('.press-release time', 0)->innertext);
+                    $date = DateTime::createFromFormat('H:i d.m.Y', $date)->format('Y-m-d H:i:s');
+
                     // проверяем, когда 2 менеджера оставили комментарии и обновляем, если созданы
                     if ($pressFirstManger) {
 
                         $firstPressManager = PressConference::where([
-                            ['first_team_id', $game->first_team_id],
-                            ['game_id', $game->id],
-                        ])
+                                ['first_team_id', $game->first_team_id],
+                                ['game_id', $game->id],
+                            ])
                             ->first();
 
-                        if ($firstPressManager === null) {
+                        if (!$firstPressManager) {
                             $press = new PressConference();
                             $press->first_team_id = $game->first_team_id;
                             $press->game_id = $game->id;
                             $press->press_conference = trim($pressDom->find('.press-release', 0)->innertext);
+                            $press->date = $date;
                             $press->save();
                         } else {
                             $firstPressManager->comment = trim($pressDom->find('.press-release', 0)->innertext);
+                            $firstPressManager->date = $date;
                             $firstPressManager->save();
                         }
                     }
@@ -169,14 +175,16 @@ class PressesParser extends Command
                             ])
                             ->first();
 
-                        if ($secondPressManager === null) {
+                        if (!$secondPressManager) {
                             $press = new PressConference();
                             $press->second_team_id = $game->second_team_id;
                             $press->game_id = $game->id;
                             $press->press_conference = trim($pressDom->find('.press-release', 0)->innertext);
+                            $press->date = $date;
                             $press->save();
                         } else {
                             $secondPressManager->comment = trim($pressDom->find('.press-release', 0)->innertext);
+                            $secondPressManager->date = $date;
                             $secondPressManager->save();
                         }
                     }
@@ -188,14 +196,16 @@ class PressesParser extends Command
                             ])
                             ->first();
 
-                        if ($firstPressManager === null) {
+                        if (!$firstPressManager) {
                             $press = new PressConference();
                             $press->first_team_id = $game->first_team_id;
                             $press->game_id = $game->id;
                             $press->press_conference = trim($pressDom->find('.press-release', 0)->innertext);
+                            $press->date = $date;
                             $press->save();
                         } else {
                             $firstPressManager->comment = trim($pressDom->find('.press-release', 0)->innertext);
+                            $firstPressManager->date = $date;
                             $firstPressManager->save();
                         }
 
@@ -205,14 +215,16 @@ class PressesParser extends Command
                             ])
                             ->first();
 
-                        if ($secondPressManager === null) {
+                        if (!$secondPressManager) {
                             $press = new PressConference();
                             $press->second_team_id = $game->second_team_id;
                             $press->game_id = $game->id;
                             $press->press_conference = trim($pressDom->find('.press-release', 1)->innertext);
+                            $press->date = $date;
                             $press->save();
                         } else {
                             $secondPressManager->comment = trim($pressDom->find('.press-release', 1)->innertext);
+                            $secondPressManager->date = $date;
                             $secondPressManager->save();
                         }
                     }
