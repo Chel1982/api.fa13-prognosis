@@ -19,6 +19,7 @@ class CreatePressConferencesTable extends Migration
             $table->unsignedBigInteger('first_team_id')->nullable();
             $table->unsignedBigInteger('second_team_id')->nullable();
             $table->unsignedBigInteger('game_id');
+            $table->timestamp('date');
             $table->timestamps();
 
 
