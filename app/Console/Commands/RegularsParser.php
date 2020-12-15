@@ -78,9 +78,9 @@ class RegularsParser extends Command
                     $nameRegularChamp = trim($domRegularChamp->find('h2', 0)->plaintext);
 
                     $tournament = Tournament::where([
-                        ['name', $nameRegularChamp],
-                        ['status', self::KIND_CHAMP]
-                    ])
+                            ['name', $nameRegularChamp],
+                            ['status', self::KIND_CHAMP]
+                        ])
                         ->first();
 
                     if ($tournament === null) {
