@@ -162,6 +162,7 @@ class PressesParser extends Command
                             $press->date = $date;
                             $press->save();
                         } else {
+                            // если вдруг менеджер дополнил комментарий, то дополняем его
                             $firstPressManager->comment = trim($pressDom->find('.press-release', 0)->innertext);
                             $firstPressManager->date = $date;
                             $firstPressManager->save();
@@ -216,6 +217,9 @@ class PressesParser extends Command
                             ->first();
 
                         if (!$secondPressManager) {
+                            $date = trim($pressDom->find('.press-release time', 1)->innertext);
+                            $date = DateTime::createFromFormat('H:i d.m.Y', $date)->format('Y-m-d H:i:s');
+
                             $press = new PressConference();
                             $press->second_team_id = $game->second_team_id;
                             $press->game_id = $game->id;
