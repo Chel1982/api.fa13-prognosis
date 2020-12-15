@@ -16,8 +16,8 @@ class RegularsParser extends Command
     const URL_FA13 = 'https://www.fa13.info';
     const SEASON_NUMBER = 40;
     const KIND_CHAMP = 'regular';
-    const STATUS_PLAYED = 1;
-    const STATUS_NOT_PLAYED = 0;
+    const STATUS_PLAYED = 'played';
+    const STATUS_NOT_PLAYED = 'not_played';
 
     /**
      * The name and signature of the console command.
@@ -65,26 +65,31 @@ class RegularsParser extends Command
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $tournament = Tournament::where([
-                ['name', trim($e->plaintext)],
-                ['status', self::KIND_CHAMP]
-            ])
-                ->first();
-
-            if ($tournament === null) {
-                $tournament = new Tournament();
-                $tournament->name = trim($e->plaintext);
-                $tournament->status = self::KIND_CHAMP;
-                $tournament->save();
-            }
-
             $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/schedule');
 
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
             foreach ($domRegularChamp->find('div[class="col col50"]') as $elRegularChamp) {
 //                sleep(rand(0,3));
-                foreach ($elRegularChamp->find('table[class="alternated-rows-bg wide"] > tr') as $elGame) {sleep(rand(0,3));
+                foreach ($elRegularChamp->find('table[class="alternated-rows-bg wide"] > tr') as $elGame) {
+
+                    //sleep(rand(0,3));
+
+                    $nameRegularChamp = trim($domRegularChamp->find('h2', 0)->plaintext);
+
+                    $tournament = Tournament::where([
+                        ['name', $nameRegularChamp],
+                        ['status', self::KIND_CHAMP]
+                    ])
+                        ->first();
+
+                    if ($tournament === null) {
+                        $tournament = new Tournament();
+                        $tournament->name = $nameRegularChamp;
+                        $tournament->status = self::KIND_CHAMP;
+                        $tournament->save();
+                    }
+
                     //пропускаем первый тег, в котором нет нужной информации
                     $th = $elGame->find('th', 0) ? 1 : 0;
 
@@ -93,7 +98,7 @@ class RegularsParser extends Command
                     }
 
                     $tourDate = explode(',', strip_tags(implode(',', $elRegularChamp->find('h3'))));
-                    $tour = substr(trim($tourDate[0]), (strpos(trim($tourDate[0]), '-') + 1));
+                    $tour = trim($tourDate[0]);
                     $date = DateTime::createFromFormat('d.m.Y', trim($tourDate[1]))->format('Y-m-d');
 
                     // если игры еще не прошли, голы заводим в null
@@ -101,7 +106,7 @@ class RegularsParser extends Command
                         $scoreFirst = null;
                         $scoreSecond = null;
                     } else {
-                        $score = trim($elGame->find('span',0)->plaintext);
+                        $score = trim($elGame->find('span', 0)->plaintext);
                         $scoreFirst = (int)substr($score, 0,1);
                         $scoreSecond = (int)substr($score, 2,1);
                     }
