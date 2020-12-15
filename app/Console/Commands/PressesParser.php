@@ -80,7 +80,10 @@ class PressesParser extends Command
 
             foreach ($domRegularChamp->find('div[class="col col50"]') as $elRegularChamp) {
 //                sleep(rand(0,3));
-                foreach ($elRegularChamp->find('table[class="alternated-rows-bg wide"] > tr') as $elGame) {sleep(rand(0,3));
+                foreach ($elRegularChamp->find('table[class="alternated-rows-bg wide"] > tr') as $elGame) {
+
+//                    sleep(rand(0,3));
+
                     $th = $elGame->find('th', 0) ? 1 : 0;
 
                     $pressBool = $elGame->find('.l-g-press-release-3', 0) ? 1 : 0;
@@ -93,8 +96,8 @@ class PressesParser extends Command
                         continue 2;
                     }
 
-                    $tourDate = strip_tags(implode(',', $elRegularChamp->find('h3')));
-                    $tour = substr($tourDate, 7, 1);
+                    $tourDate = explode(',', strip_tags(implode(',', $elRegularChamp->find('h3'))));
+                    $tour = trim($tourDate[0]);
 
                     $teamFirst = trim($elGame->find('a', 0)->plaintext);
                     $team1 = Team::where('name', $teamFirst)->first();
@@ -103,15 +106,15 @@ class PressesParser extends Command
                     $team2 = Team::where('name', $teamSecond)->first();
 
                     $game = Game::where([
-                        ['tour', $tour],
-                        ['season_id', $season->id],
-                        ['tournament_id', $tournament->id],
-                        ['first_team_id', $team1->id],
-                        ['second_team_id', $team2->id],
-                    ])
+                            ['tour', $tour],
+                            ['season_id', $season->id],
+                            ['tournament_id', $tournament->id],
+                            ['first_team_id', $team1->id],
+                            ['second_team_id', $team2->id],
+                        ])
                         ->first();
 
-                    if ($game == null) {
+                    if ($game === null) {
                         continue;
                     }
 
@@ -160,11 +163,10 @@ class PressesParser extends Command
                     }
 
                     if ($pressSecondManger) {
-
                         $secondPressManager = PressConference::where([
-                            ['second_team_id', $game->second_team_id],
-                            ['game_id', $game->id],
-                        ])
+                                ['second_team_id', $game->second_team_id],
+                                ['game_id', $game->id],
+                            ])
                             ->first();
 
                         if ($secondPressManager === null) {
@@ -181,9 +183,9 @@ class PressesParser extends Command
 
                     if ($pressMangers) {
                         $firstPressManager = PressConference::where([
-                            ['first_team_id', $game->first_team_id],
-                            ['game_id', $game->id],
-                        ])
+                                ['first_team_id', $game->first_team_id],
+                                ['game_id', $game->id],
+                            ])
                             ->first();
 
                         if ($firstPressManager === null) {
@@ -198,9 +200,9 @@ class PressesParser extends Command
                         }
 
                         $secondPressManager = PressConference::where([
-                            ['second_team_id', $game->second_team_id],
-                            ['game_id', $game->id],
-                        ])
+                                ['second_team_id', $game->second_team_id],
+                                ['game_id', $game->id],
+                            ])
                             ->first();
 
                         if ($secondPressManager === null) {
