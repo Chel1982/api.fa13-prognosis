@@ -19,9 +19,12 @@ class CreateCommentsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('game_id')->nullable();
             $table->unsignedBigInteger('press_conference_id')->nullable();
+            $table->string('status');
             $table->timestamps();
 
             $table->nestedSet();
+
+            $table->index(['status']);
 
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('restrict')->onDelete('restrict');
             $table->foreign('game_id')->references('id')->on('games')->onUpdate('restrict')->onDelete('restrict');
