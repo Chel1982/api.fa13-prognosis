@@ -148,12 +148,6 @@ class PressesParser extends Command
 
                     $pressConference = trim($pressDom->find('.press-release', 0)->innertext);
 
-                    // когда пришли оба менеджера, надо дополнить перссуху 2го менеджера
-                    $dateBoth = trim($pressDom->find('.press-release time', 1)->innertext);
-                    $dateBoth = DateTime::createFromFormat('H:i d.m.Y', $dateBoth)->format('Y-m-d H:i:s');
-
-                    $pressConferenceBoth = trim($pressDom->find('.press-release', 1)->innertext);
-
                     // проверяем, когда 2 менеджера оставили комментарии и обновляем, если созданы
                     if ($pressFirstManger) {
 
@@ -200,6 +194,12 @@ class PressesParser extends Command
                     }
 
                     if ($pressMangers) {
+                        // когда пришли оба менеджера, надо дополнить прессуху 2го менеджера
+                        $dateBoth = trim($pressDom->find('.press-release time', 1)->innertext);
+                        $dateBoth = DateTime::createFromFormat('H:i d.m.Y', $dateBoth)->format('Y-m-d H:i:s');
+
+                        $pressConferenceBoth = trim($pressDom->find('.press-release', 1)->innertext);
+
                         $firstPressManager = PressConference::where([
                                 ['first_team_id', $game->first_team_id],
                                 ['game_id', $game->id],
