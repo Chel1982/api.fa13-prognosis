@@ -6,7 +6,9 @@ use App\Models\Game;
 use App\Models\Season;
 use App\Models\Team;
 use App\Models\TeamTournament;
+use App\Models\TextSource;
 use App\Models\Tournament;
+use App\Models\VideoSource;
 use DateTime;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
@@ -52,7 +54,7 @@ class RegularsParser extends Command
     {
         $season = Season::where('number', self::SEASON_NUMBER)->first();
 
-        if ($season === null) {
+        if (!$season) {
             $season = new Season();
             $season->number = self::SEASON_NUMBER;
             $season->save();
@@ -83,7 +85,7 @@ class RegularsParser extends Command
                         ])
                         ->first();
 
-                    if ($tournament === null) {
+                    if (!$tournament) {
                         $tournament = new Tournament();
                         $tournament->name = $nameRegularChamp;
                         $tournament->status = self::KIND_CHAMP;
@@ -141,7 +143,7 @@ class RegularsParser extends Command
                         $teamTournament->save();
                     }
 
-                    if ($team1 === null) {
+                    if (!$team1) {
                         $team1 = new Team();
                         $team1->name = $teamFirst;
                         $team1->save();
@@ -153,7 +155,7 @@ class RegularsParser extends Command
                         $teamTournament->save();
                     }
 
-                    if ($team2 === null) {
+                    if (!$team2) {
                         $team2 = new Team();
                         $team2->name = $teamSecond;
                         $team2->save();
@@ -173,7 +175,7 @@ class RegularsParser extends Command
                         ['second_team_id', $team2->id],
                     ])->first();
 
-                    if ($game === null) {
+                    if (!$game) {
                         $game = new Game();
                         $game->tour = $tour;
                         $game->date = $date;
@@ -187,10 +189,31 @@ class RegularsParser extends Command
                         $game->save();
                     }
 
-                    if ($scoreFirst != null && $scoreSecond != null && $game->staus == self::STATUS_NOT_PLAYED) {
+                    if ($scoreFirst !== null && $scoreSecond !== null && $game->staus == self::STATUS_NOT_PLAYED) {
                         $game->first_team_score = $scoreFirst;
                         $game->second_team_score = $scoreSecond;
                         $game->save();
+                    }
+
+                    if ($scoreFirst !== null && $scoreSecond !== null) {
+                        $videoSource = explode("'", trim($elGame->find('td nobr a', 0)->attr['onclick']))[1];
+                        $textSource = 'http:' . trim($elGame->find('td nobr a', 2)->attr['href']);
+
+                        $videoS = VideoSource::where('game_id', $game->id)->first();
+                        if (!$videoS) {
+                            $videoNewSource = new VideoSource();
+                            $videoNewSource->source = $videoSource;
+                            $videoNewSource->game_id = $game->id;
+                            $videoNewSource->save();
+                        }
+
+                        $textS = TextSource::where('game_id', $game->id)->first();
+                        if (!$textS) {
+                            $textNewSource = new TextSource();
+                            $textNewSource->source = $textSource;
+                            $textNewSource->game_id = $game->id;
+                            $textNewSource->save();
+                        }
                     }
                 }
             }
