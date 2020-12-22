@@ -15,4 +15,29 @@ class Game extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
+    public function tournament()
+    {
+        return $this->belongsTo(Tournament::class);
+    }
+
+    public function firstTeam()
+    {
+        return $this->belongsTo(Team::class, 'first_team_id');
+    }
+
+    public function secondTeam()
+    {
+        return $this->belongsTo(Team::class, 'second_team_id');
+    }
+
+    public function videoSource()
+    {
+        return $this->hasOne(VideoSource::class);
+    }
+
+    public function textSource()
+    {
+        return $this->hasOne(TextSource::class);
+    }
 }
