@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\PressConference;
 
+/**
+ * Class PressConferenceController
+ *
+ * @package App\Http\Controllers\Api\V1
+ */
 class PressConferenceController extends Controller
 {
     /**
@@ -29,7 +34,6 @@ class PressConferenceController extends Controller
      *  ),
      * )
      */
-
 
     /**
      * @param  int  $count
