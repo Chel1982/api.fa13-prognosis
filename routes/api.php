@@ -23,5 +23,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(['prefix' => '/v1'], function() {
     Route::post('register', [PassportAuthController::class, 'register']);
     Route::post('login', [PassportAuthController::class, 'login']);
-    Route::get('press-conferences', [PressConferenceController::class, 'index']);
+    Route::get('press-conferences/{count}', [PressConferenceController::class, 'index']);
 });

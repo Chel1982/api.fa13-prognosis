@@ -4,34 +4,45 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\PressConference;
-use Illuminate\Http\Request;
 
 class PressConferenceController extends Controller
 {
     /**
      * @OA\Get(
-     *  path="/api/v1/press-conferences",
-     *  description="Получение последних 10 пресс - конференций",
+     *  path="/api/v1/press-conferences/{count}",
+     *  description="Получение последних пресс - конференций. Максимальное количество
+           за 1 запрос = 100, если больше 100, то вернеться 1 пресс-конференция",
      *  tags={"Пресс - конференции"},
      *  operationId="getPressConferenes",
+     *     @OA\Parameter(
+     *         description="Количество полученных пресс-конференций",
+     *         in="path",
+     *         name="count",
+     *         required=true,
+     *         @OA\Schema(
+     *           type="integer"
+     *         )
+     *     ),
      *  @OA\Response(
      *      response=200,
      *      description="successful operation",
-     *      @OA\MediaType(
-     *          mediaType="application/json",
-     *      )
      *  ),
      * )
      */
 
+
     /**
+     * @param  int  $count
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(int $count)
     {
+        $count = $count < 101 ? $count : 1;
+
         $pressConference = PressConference::latest('date')
             ->with('game', 'game.tournament', 'game.firstTeam', 'game.secondTeam', 'game.videoSource', 'game.textSource')
-            ->paginate(10);
+            ->paginate($count);
 
         return response()->json($pressConference, 200);
     }
