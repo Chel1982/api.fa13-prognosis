@@ -20,9 +20,9 @@ class CreateTeamTournamentsTable extends Migration
             $table->unsignedBigInteger('season_id');
             $table->timestamps();
 
-            $table->foreign('team_id')->references('id')->on('teams')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign('tournament_id')->references('id')->on('tournaments')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign('season_id')->references('id')->on('seasons')->onUpdate('restrict')->onDelete('restrict');
+            $table->foreign('team_id')->references('id')->on('teams')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('tournament_id')->references('id')->on('tournaments')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('season_id')->references('id')->on('seasons')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

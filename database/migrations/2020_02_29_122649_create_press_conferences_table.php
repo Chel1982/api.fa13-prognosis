@@ -23,9 +23,9 @@ class CreatePressConferencesTable extends Migration
             $table->timestamps();
 
 
-            $table->foreign('first_team_id')->references('id')->on('teams')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign('second_team_id')->references('id')->on('teams')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign('game_id')->references('id')->on('games')->onUpdate('restrict')->onDelete('restrict');
+            $table->foreign('first_team_id')->references('id')->on('teams')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('second_team_id')->references('id')->on('teams')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('game_id')->references('id')->on('games')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

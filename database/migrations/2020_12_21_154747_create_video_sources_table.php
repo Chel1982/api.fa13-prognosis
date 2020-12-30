@@ -19,7 +19,7 @@ class CreateVideoSourcesTable extends Migration
             $table->unsignedBigInteger('game_id');
             $table->timestamps();
 
-            $table->foreign('game_id')->references('id')->on('games')->onUpdate('restrict')->onDelete('restrict');
+            $table->foreign('game_id')->references('id')->on('games')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

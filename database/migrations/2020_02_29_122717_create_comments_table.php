@@ -26,9 +26,9 @@ class CreateCommentsTable extends Migration
 
             $table->index(['status']);
 
-            $table->foreign('user_id')->references('id')->on('users')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign('game_id')->references('id')->on('games')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign('press_conference_id')->references('id')->on('press_conferences')->onUpdate('restrict')->onDelete('restrict');
+            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('game_id')->references('id')->on('games')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('press_conference_id')->references('id')->on('press_conferences')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
