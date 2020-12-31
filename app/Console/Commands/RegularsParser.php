@@ -76,10 +76,17 @@ class RegularsParser extends Command
         $html = file_get_contents(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
 
-
-        // доделать, что бы парсер заходил в 1 чемпионат, а не бегал по Австрии-2 и т.д.
         if ($sourceChamp === 'cup') {
-            $linkToParse = $dom->find('tbody a');
+            //пробегаем по tr и выбираем ссылки только с первыми дивизионами
+            $linkToParse = [];
+            $i = 0;
+            foreach ($dom->find('tbody tr') as $item) {
+                if ($i === 0) {
+                    $i++;
+                    continue;
+                }
+                $linkToParse[] = $item->find('a', 0);
+            }
         }
 
         if ($sourceChamp === 'schedule') {
@@ -97,9 +104,7 @@ class RegularsParser extends Command
             foreach ($domRegularChamp->find('div[class="col col50"]') as $elRegularChamp) {
 //                sleep(rand(0,3));
                 foreach ($elRegularChamp->find('table[class="alternated-rows-bg wide"] > tr') as $elGame) {
-
                     //sleep(rand(0,3));
-
                     $nameRegularChamp = trim($domRegularChamp->find('h2', 0)->plaintext);
 
                     $tournament = Tournament::where([

@@ -71,7 +71,24 @@ class PressesParser extends Command
         $html = file_get_contents(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
 
-        foreach ($dom->find('tbody a') as $e) {
+        if ($sourceChamp === 'cup') {
+            //пробегаем по tr и выбираем ссылки только с первыми дивизионами
+            $linkToParse = [];
+            $i = 0;
+            foreach ($dom->find('tbody tr') as $item) {
+                if ($i === 0) {
+                    $i++;
+                    continue;
+                }
+                $linkToParse[] = $item->find('a', 0);
+            }
+        }
+
+        if ($sourceChamp === 'schedule') {
+            $linkToParse = $dom->find('tbody a');
+        }
+
+        foreach ($linkToParse as $e) {
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
