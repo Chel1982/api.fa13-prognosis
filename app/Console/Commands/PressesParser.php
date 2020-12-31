@@ -127,8 +127,6 @@ class PressesParser extends Command
                         ])
                         ->first();
 
-//                    file_put_contents('1.txt', $game); die();
-
                     if ($game === null) {
                         continue;
                     }
