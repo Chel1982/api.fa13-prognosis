@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ExtraTimeScore;
 use App\Models\Game;
 use App\Models\Season;
 use App\Models\Team;
@@ -17,7 +18,6 @@ class RegularsParser extends Command
 {
     const URL_FA13 = 'https://www.fa13.info';
     const SEASON_NUMBER = 40;
-    const KIND_CHAMP = 'regular';
     const STATUS_PLAYED = 'played';
     const STATUS_NOT_PLAYED = 'not_played';
 
@@ -26,7 +26,7 @@ class RegularsParser extends Command
      *
      * @var string
      */
-    protected $signature = 'command:regulars';
+    protected $signature = 'command:regulars {source_champ : must be schedule(regular) or cup(cup)}';
 
     /**
      * The console command description.
@@ -52,6 +52,19 @@ class RegularsParser extends Command
      */
     public function handle()
     {
+        $sourceChamp = $this->argument('source_champ');
+
+        switch ($sourceChamp) {
+            case 'schedule':
+                $kindChamp = 'regular';
+                break;
+            case 'cup':
+                $kindChamp = 'cup';
+                break;
+            default:
+                die('wrong parameter source_champ' . PHP_EOL);
+        }
+
         $season = Season::where('number', self::SEASON_NUMBER)->first();
 
         if (!$season) {
@@ -63,11 +76,21 @@ class RegularsParser extends Command
         $html = file_get_contents(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
 
-        foreach ($dom->find('tbody a') as $e) {
+
+        // доделать, что бы парсер заходил в 1 чемпионат, а не бегал по Австрии-2 и т.д.
+        if ($sourceChamp === 'cup') {
+            $linkToParse = $dom->find('tbody a');
+        }
+
+        if ($sourceChamp === 'schedule') {
+            $linkToParse = $dom->find('tbody a');
+        }
+
+        foreach ($linkToParse as $e) {
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/schedule');
+            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/' . $sourceChamp);
 
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
@@ -81,14 +104,14 @@ class RegularsParser extends Command
 
                     $tournament = Tournament::where([
                             ['name', $nameRegularChamp],
-                            ['status', self::KIND_CHAMP]
+                            ['status', $kindChamp]
                         ])
                         ->first();
 
                     if (!$tournament) {
                         $tournament = new Tournament();
                         $tournament->name = $nameRegularChamp;
-                        $tournament->status = self::KIND_CHAMP;
+                        $tournament->status = $kindChamp;
                         $tournament->save();
                     }
 
@@ -103,14 +126,35 @@ class RegularsParser extends Command
                     $tour = trim($tourDate[0]);
                     $date = DateTime::createFromFormat('d.m.Y', trim($tourDate[1]))->format('Y-m-d');
 
-                    // если игры еще не прошли, голы заводим в null
+                    // если игры еще не прошли, голы заводим в null, проверяем по количеству зрителей
                     if (trim($elGame->find('.non-mobile', 0)->plaintext) == 0) {
                         $scoreFirst = null;
                         $scoreSecond = null;
+                        $scoreFirstExtraTime = null;
+                        $scoreSecondExtraTime = null;
                     } else {
                         $score = trim($elGame->find('span', 0)->plaintext);
-                        $scoreFirst = (int)substr($score, 0,1);
-                        $scoreSecond = (int)substr($score, 2,1);
+
+                        // если в счете отсутствует (пен.4:5), то разделяем по ":"
+                        if (!stripos($score, 'н')) {
+                            $score = explode(":", $score);
+                            $scoreFirst = (int)$score[0];
+                            $scoreSecond = (int)$score[1];
+                            $scoreFirstExtraTime = null;
+                            $scoreSecondExtraTime = null;
+                        } else {
+                            $mainTimeScore = stristr($score, '(', true);
+                            $mainTimeScore = explode(":", $mainTimeScore);
+
+                            $scoreFirst = (int)$mainTimeScore[0];
+                            $scoreSecond = (int)$mainTimeScore[1];
+
+                            $extraTimeScore = trim(stristr(trim(ltrim(stristr($score, '.')), '.'), ')', true));
+
+                            $extraTimeScore = explode(":", $extraTimeScore);
+                            $scoreFirstExtraTime = (int)$extraTimeScore[0];
+                            $scoreSecondExtraTime = (int)$extraTimeScore[1];
+                        }
                     }
 
                     $teamFirst = trim($elGame->find('a', 0)->plaintext);
@@ -193,6 +237,18 @@ class RegularsParser extends Command
                         $game->first_team_score = $scoreFirst;
                         $game->second_team_score = $scoreSecond;
                         $game->save();
+                    }
+
+                    if ($scoreFirstExtraTime !== null
+                        && $scoreSecondExtraTime !== null
+                        && $game->status == self::STATUS_PLAYED
+                        && !ExtraTimeScore::where('game_id', $game->id)->exists()
+                    ) {
+                        $extraTimeScore = new ExtraTimeScore();
+                        $extraTimeScore->first_team_score = $scoreFirstExtraTime;
+                        $extraTimeScore->second_team_score = $scoreSecondExtraTime;
+                        $extraTimeScore->game_id = $game->id;
+                        $extraTimeScore->save();
                     }
 
                     if ($scoreFirst !== null && $scoreSecond !== null) {
