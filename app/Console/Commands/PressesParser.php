@@ -15,14 +15,13 @@ class PressesParser extends Command
 {
     const URL_FA13 = 'https://www.fa13.info';
     const SEASON_NUMBER = 40;
-    const KIND_CHAMP = 'regular';
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:presses';
+    protected $signature = 'command:presses {source_champ : must be schedule(regular) or cup(cup)}';
 
     /**
      * The console command description.
@@ -48,6 +47,19 @@ class PressesParser extends Command
      */
     public function handle()
     {
+        $sourceChamp = $this->argument('source_champ');
+
+        switch ($sourceChamp) {
+            case 'schedule':
+                $kindChamp = 'regular';
+                break;
+            case 'cup':
+                $kindChamp = 'cup';
+                break;
+            default:
+                die('wrong parameter source_champ' . PHP_EOL);
+        }
+
         $season = Season::where('number', self::SEASON_NUMBER)->first();
 
         if ($season === null) {
@@ -63,7 +75,7 @@ class PressesParser extends Command
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/schedule');
+            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/' . $sourceChamp);
 
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
@@ -71,7 +83,7 @@ class PressesParser extends Command
 
             $tournament = Tournament::where([
                     ['name', $nameRegularChamp],
-                    ['status', self::KIND_CHAMP]
+                    ['status', $kindChamp]
                 ])
                 ->first();
 
@@ -114,6 +126,8 @@ class PressesParser extends Command
                             ['second_team_id', $team2->id],
                         ])
                         ->first();
+
+//                    file_put_contents('1.txt', $game); die();
 
                     if ($game === null) {
                         continue;
