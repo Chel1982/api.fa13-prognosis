@@ -45,7 +45,13 @@ class PressConferenceController extends Controller
         $count = $count < 101 ? $count : 1;
 
         $pressConference = PressConference::latest('date')
-            ->with('game', 'game.tournament', 'game.firstTeam', 'game.secondTeam', 'game.videoSource', 'game.textSource')
+            ->with(
+                'game',
+                'game.tournament',
+                'game.firstTeam',
+                'game.secondTeam',
+                'game.videoSource',
+                'game.textSource')
             ->paginate($count);
 
         return response()->json($pressConference, 200);
