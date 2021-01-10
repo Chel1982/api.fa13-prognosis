@@ -26,4 +26,5 @@ Route::group(['prefix' => '/v1'], function() {
     Route::post('login', [PassportAuthController::class, 'login']);
     Route::get('press-conferences/{count}', [PressConferenceController::class, 'index']);
     Route::get('tournament-list/{status}', [TournamentController::class, 'indexList']);
+    Route::get('press-conferences/tournament_id/{tournament_id}/count/{count}', [PressConferenceController::class, 'indexTournament']);
 });
