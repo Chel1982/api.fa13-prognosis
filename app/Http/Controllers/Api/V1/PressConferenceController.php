@@ -19,7 +19,8 @@ class PressConferenceController extends Controller
      * @OA\Get(
      *  path="/api/v1/press-conferences/{count}",
      *  description="Получение последних пресс - конференций. Максимальное количество
-           за 1 запрос = 100, если больше 100, то вернеться 1 пресс-конференция",
+        за 1 запрос = 100, если больше 100, то вернеться 1 пресс-конференция"
+        Пагинация работает по правилам laravel,
      *  tags={"Пресс - конференции"},
      *  operationId="getAllLastPressConferenes",
      *     @OA\Parameter(
@@ -64,7 +65,8 @@ class PressConferenceController extends Controller
      * @OA\Get(
      *  path="/api/v1/press-conferences/tournament_id/{tournament_id}/count/{count}",
      *  description="Получение последних пресс - конференций определенного турнира. Максимальное количество
-    за 1 запрос = 100, если больше 100, то вернеться 1 пресс-конференция",
+        за 1 запрос = 100, если больше 100, то вернеться 1 пресс-конференция.
+        Пагинация работает по правилам laravel",
      *  tags={"Пресс - конференции"},
      *  operationId="getTurnamentLastPressConferenes",
      *     @OA\Parameter(
