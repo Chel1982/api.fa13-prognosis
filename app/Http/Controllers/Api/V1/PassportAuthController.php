@@ -8,7 +8,6 @@ use App\Http\Requests\Api\V1\PassportAuthController\RegisterRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-
 /**
  * Class PassportAuthController
  *
