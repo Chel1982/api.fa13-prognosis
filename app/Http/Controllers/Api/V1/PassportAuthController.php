@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\PassportAuthController\LoginRequest;
 use App\Http\Requests\Api\V1\PassportAuthController\RegisterRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 /**
  * Class PassportAuthController
@@ -71,14 +72,14 @@ class PassportAuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password)
+            'name' => $request->get('name'),
+            'email' => $request->get('email'),
+            'password' => bcrypt($request->get('password'))
         ]);
 
         $token = $user->createToken('LaravelAuthApp')->accessToken;
 
-        return response()->json(['token' => $token], 200);
+        return response()->json(['user' => $user, 'token' => $token], 200);
     }
 
     /**
@@ -121,15 +122,55 @@ class PassportAuthController extends Controller
     public function login(LoginRequest $request)
     {
         $data = [
-            'email' => $request->email,
-            'password' => $request->password
+            'email' => $request->get('email'),
+            'password' => $request->get('password')
         ];
 
-        if( Auth::attempt($data) ) {
+        if(Auth::attempt($data)) {
             $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-            return response()->json(['token' => $token], 200);
+            return response()->json(['user' => auth()->user(), 'token' => $token], 200);
         }
 
-        return response()->json(['error' => 'Unauthorised'], 401);
+        return response()->json(['error' => 'Не зарегистрированный пользователь'], 401);
+    }
+
+    /**
+     * @OA\Delete(
+     *  path="/api/v1/logout",
+     *  description="Производится выход из системы пользователем. Необходимо
+        прикреить в заголовоки(headers) Authorization : Bearer token",
+     *  tags={"Аутентификация пользователя"},
+     *  security={{"bearerAuth":{}}},
+     *  operationId="logoutUser",
+     *   @OA\Parameter(
+     *      name="token",
+     *      in="header",
+     *      required=true,
+     *      @OA\SecurityScheme(
+     *          securityScheme="bearerAuth",
+     *          type="http",
+     *          in="header",
+     *          name="Authorization",
+     *          scheme="bearer"
+     *      ),
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="successful operation",
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *          )
+     *      ),
+     * )
+     */
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request) {
+        $request->user()->token()->revoke();
+        return response()->json(['successful operation'], 200);
     }
 }
