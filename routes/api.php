@@ -19,12 +19,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['prefix' => '/v1'], function() {
-    Route::post('register', [PassportAuthController::class, 'register']);
-    Route::post('login', [PassportAuthController::class, 'login']);
     Route::get('press-conferences/{count}', [PressConferenceController::class, 'index']);
     Route::get('tournament-list/{status}', [TournamentController::class, 'indexList']);
     Route::get('press-conferences/tournament_id/{tournament_id}/count/{count}', [PressConferenceController::class, 'indexTournament']);
 
+    Route::post('login', [PassportAuthController::class, 'login']);
+    Route::post('register', [PassportAuthController::class, 'register']);
     Route::get('user', [PassportAuthController::class, 'auth'])->middleware('auth:api');
     Route::delete('logout', [PassportAuthController::class, 'logout'])->middleware('auth:api');
     Route::get('comment', [CommentController::class, 'index'])->middleware('auth:api');
