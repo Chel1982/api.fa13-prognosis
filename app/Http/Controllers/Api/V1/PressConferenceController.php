@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Game;
 use App\Models\PressConference;
-use App\Models\Tournament;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class PressConferenceController
@@ -17,7 +14,7 @@ class PressConferenceController extends Controller
 {
     /**
      * @OA\Get(
-     *  path="/api/v1/press-conferences/{count}",
+     *  path="/api/v1/press-conferences/count/{count}",
      *  description="Получение последних пресс - конференций. Максимальное количество
         за 1 запрос = 100, если больше 100, то вернеться 1 пресс-конференция
         Пагинация работает по правилам laravel",
