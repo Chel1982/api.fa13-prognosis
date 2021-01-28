@@ -131,7 +131,7 @@ class PassportAuthController extends Controller
             return response()->json(['user' => auth()->user(), 'token' => $token], 200);
         }
 
-        return response()->json(['errors' => 'Email или пароль не верны'], 401);
+        return response()->json(['errors' => ['auth' => 'Email или пароль не верны']], 401);
     }
 
     /**
