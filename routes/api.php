@@ -25,9 +25,7 @@ Route::group(['prefix' => '/v1'], function() {
     Route::get('tournament-list/{status}', [TournamentController::class, 'indexList']);
     Route::get('press-conferences/tournament_id/{tournament_id}/count/{count}', [PressConferenceController::class, 'indexTournament']);
 
-    Route::middleware('auth:api')->get('/user', function (Request $request) {
-        return $request->user();
-    });
-    Route::delete('logout',[PassportAuthController::class, 'logout'])->middleware('auth:api');
+    Route::get('user', [PassportAuthController::class, 'auth'])->middleware('auth:api');
+    Route::delete('logout', [PassportAuthController::class, 'logout'])->middleware('auth:api');
     Route::get('comment', [CommentController::class, 'index'])->middleware('auth:api');
 });
