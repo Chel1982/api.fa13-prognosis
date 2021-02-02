@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Game extends Model
 {
+    public function pressConferences()
+    {
+        return $this->hasMany(PressConference::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(Comment::class);
-    }
-
-    public function teams()
-    {
-        return $this->belongsTo(Team::class);
     }
 
     public function tournament()
