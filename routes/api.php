@@ -24,9 +24,10 @@ Route::group(['prefix' => '/v1'], function() {
     Route::get('press-conferences/tournament_id/{tournament_id}/count/{count}', [PressConferenceController::class, 'indexTournament']);
     Route::get('game/id/{id}', [GameController::class, 'show']);
 
+    Route::post('comment/game/', [CommentController::class, 'store'])->middleware('auth:api');
+
     Route::post('login', [PassportAuthController::class, 'login']);
     Route::post('register', [PassportAuthController::class, 'register']);
     Route::get('user', [PassportAuthController::class, 'auth'])->middleware('auth:api');
     Route::delete('logout', [PassportAuthController::class, 'logout'])->middleware('auth:api');
-    Route::get('comment', [CommentController::class, 'index'])->middleware('auth:api');
 });
