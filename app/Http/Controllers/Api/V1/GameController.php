@@ -21,10 +21,10 @@ class GameController extends Controller
                 'secondTeam',
                 'videoSource',
                 'textSource',
-                'pressConferences',
-                'comments'
+                'pressConferences'
             )
             ->firstOrFail();
+
         return response()->json($game, 200);
     }
 }
