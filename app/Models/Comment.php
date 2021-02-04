@@ -8,4 +8,8 @@ use Kalnoy\Nestedset\NodeTrait;
 class Comment extends Model
 {
     use NodeTrait;
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

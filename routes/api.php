@@ -25,6 +25,7 @@ Route::group(['prefix' => '/v1'], function() {
     Route::get('game/id/{id}', [GameController::class, 'show']);
 
     Route::post('comment/game/', [CommentController::class, 'store'])->middleware('auth:api');
+    Route::get('comments/game/{id}', [CommentController::class, 'getCommentsByGame']);
 
     Route::post('login', [PassportAuthController::class, 'login']);
     Route::post('register', [PassportAuthController::class, 'register']);

@@ -27,6 +27,21 @@ class CommentController extends Controller
         $comment->user_id = auth()->user()->getAuthIdentifier();
         $comment->save();
 
-        return response()->json(['user' => auth()->user(), 'comment' => $comment], 200);
+        $comment['user'] = auth()->user();
+
+        return response()->json($comment, 200);
+    }
+
+    /**
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getCommentsByGame(int $id)
+    {
+        $comments = Comment::where('game_id', $id)
+            ->latest('created_at')
+            ->with('user')
+            ->get();
+        return response()->json($comments, 200);
     }
 }
