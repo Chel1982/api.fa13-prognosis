@@ -34,14 +34,17 @@ class CommentController extends Controller
 
     /**
      * @param int $id
+     * @param int $count
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCommentsByGame(int $id)
+    public function getCommentsByGame(int $id, int $count)
     {
+        $count = $count < 101 ? $count : 1;
+
         $comments = Comment::where('game_id', $id)
             ->latest('created_at')
             ->with('user')
-            ->get();
+            ->paginate($count);
         return response()->json($comments, 200);
     }
 }
