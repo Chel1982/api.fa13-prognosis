@@ -17,7 +17,7 @@ use KubAT\PhpSimple\HtmlDomParser;
 class RegularsParser extends Command
 {
     const URL_FA13 = 'https://www.fa13.info';
-    const SEASON_NUMBER = 40;
+    const SEASON_NUMBER = 41;
     const STATUS_PLAYED = 'played';
     const STATUS_NOT_PLAYED = 'not_played';
 
