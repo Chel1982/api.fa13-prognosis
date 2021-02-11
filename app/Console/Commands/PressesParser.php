@@ -14,7 +14,7 @@ use KubAT\PhpSimple\HtmlDomParser;
 class PressesParser extends Command
 {
     const URL_FA13 = 'https://www.fa13.info';
-    const SEASON_NUMBER = 40;
+    const SEASON_NUMBER = 41;
 
     /**
      * The name and signature of the console command.
