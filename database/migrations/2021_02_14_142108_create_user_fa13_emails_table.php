@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersFa13EmailsTable extends Migration
+class CreateUserFa13EmailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateUsersFa13EmailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('users_fa13_emails', function (Blueprint $table) {
+        Schema::create('user_fa13_emails', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -28,6 +28,6 @@ class CreateUsersFa13EmailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users_fa13_emails');
+        Schema::dropIfExists('user_fa13_emails');
     }
 }

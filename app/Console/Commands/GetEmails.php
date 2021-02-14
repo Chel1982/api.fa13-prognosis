@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\UserFa13Email;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
 
@@ -50,10 +51,6 @@ class GetEmails extends Command
 
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
-//            print_r(self::URL_FA13 . $e->href . '/last' . PHP_EOL);
-//            file_put_contents('1.txt', $domRegularChamp->find('table[class="alternated-rows-bg wide"] > tr'));
-
-
             foreach ($domRegularChamp->find('table[class="alternated-rows-bg wide"] > tr > td[class="teams main"]') as $elGame) {
                 //пропускаем первый тег, в котором нет нужной информации
                 $th = $elGame->find('th', 0) ? 1 : 0;
@@ -63,31 +60,7 @@ class GetEmails extends Command
                 }
 
                 foreach ($elGame->find('a') as $item) {
-
-                    $url = self::URL_FA13 . $item->href;
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                    curl_setopt($ch, CURLOPT_COOKIEJAR, dirname(__FILE__).'/cookie.txt'); // сохранять куки в файл
-                    curl_setopt($ch, CURLOPT_COOKIEFILE,  dirname(__FILE__).'/cookie.txt');
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                    curl_setopt($ch, CURLOPT_USERAGENT, "GOOGLE");  // Обманочка
-                    curl_setopt($ch, CURLOPT_HEADER, 0);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, array(
-                        'login'=>'_username',
-                        'login:_username'=>'chel@activist.com',
-                        'login:password'=>'12345678',
-                    ));
-                    echo isAuth($data = curl_exec($ch))?'Success':'Failed';
-                    $output = curl_exec($ch);
-                    curl_close($ch);
-//                    echo $output;
-
-
-
-
-
-
+                    sleep(rand(0,3));
                     $htmlCommand = file_get_contents(self::URL_FA13 . $item->href);
                     $domCommand = HtmlDomParser::str_get_html($htmlCommand);
 
@@ -97,13 +70,31 @@ class GetEmails extends Command
                         continue;
                     }
 
-                    print_r(self::URL_FA13 . $item->href . PHP_EOL);
-//                    print_r($domCommand->find('table[class="wide alternated-rows-bg"] > a[class="m-s-em"]', 0));
-                    $tableManager = $domCommand->find('tr');
-//                    $htmlManagerPage = file_get_contents(self::URL_FA13 . $tableManager->find('a', 0)->href);
-                    $domManagerPage = HtmlDomParser::str_get_html($output);
-                    file_put_contents('1.txt', $domManagerPage->find('table[class="wide alternated-rows-bg"]', 0)); die();
+                    $opts = array(
+                        'http'=>array(
+                            'method'=>"GET",
+                            'header'=>"Accept-language: en\r\n" .
+                                "Cookie: " . env('PARSER_COOKIE')
+                        )
+                    );
+                    $context = stream_context_create($opts);
+                    $htmlPage = file_get_contents(self::URL_FA13 . $item->href, false, $context);
+                    $dom = HtmlDomParser::str_get_html($htmlPage);
 
+                    $name = $dom->find('table[class="wide alternated-rows-bg"]', 0)
+                        ->find('tr', 1)
+                        ->find('a', 0)
+                        ->plaintext;
+
+                    $email = explode(':', $dom->find('a[class="m-s-em"]', 0)->href);
+
+                    $checkEmail = UserFa13Email::where('email', trim($email[1]))->exists();
+                    if(!$checkEmail) {
+                        $userFa13Email = new UserFa13Email();
+                        $userFa13Email->name = trim($name);
+                        $userFa13Email->email = trim($email[1]);
+                        $userFa13Email->save();
+                    }
                 }
             }
         }
