@@ -78,7 +78,12 @@ class GetEmails extends Command
                         )
                     );
                     $context = stream_context_create($opts);
-                    $htmlPage = file_get_contents(self::URL_FA13 . $item->href, false, $context);
+
+                    try{
+                        $htmlPage = file_get_contents(self::URL_FA13 . $item->href, false, $context);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
                     $dom = HtmlDomParser::str_get_html($htmlPage);
 
                     $name = $dom->find('table[class="wide alternated-rows-bg"]', 0)
