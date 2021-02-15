@@ -60,7 +60,7 @@ class GetEmails extends Command
                 }
 
                 foreach ($elGame->find('a') as $item) {
-                    sleep(rand(0,3));
+//                    sleep(rand(0,3));
                     $htmlCommand = file_get_contents(self::URL_FA13 . $item->href);
                     $domCommand = HtmlDomParser::str_get_html($htmlCommand);
 

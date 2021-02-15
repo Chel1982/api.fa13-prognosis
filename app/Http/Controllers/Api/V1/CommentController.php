@@ -18,11 +18,13 @@ class CommentController extends Controller
     public function store(StoreRequest $request)
     {
         $commentText = $request->get('comment');
-        $gameId = $request->get('game_id');
+        $type = $request->get('type');
+        $id = $request->get('id');
 
         $comment = new Comment;
         $comment->comment = $commentText;
-        $comment->game_id = $gameId;
+        if ($type === 'game') $comment->game_id = $id;
+        if ($type === 'tournament') $comment->tournament_id = $id;
         $comment->status = self::PUBLISH;
         $comment->user_id = auth()->user()->getAuthIdentifier();
         $comment->save();
@@ -35,13 +37,14 @@ class CommentController extends Controller
     /**
      * @param int $id
      * @param int $count
+     * @param string $type
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getCommentsByGame(int $id, int $count)
+    public function index(string $type, int $id, int $count)
     {
         $count = $count < 101 ? $count : 1;
 
-        $comments = Comment::where('game_id', $id)
+        $comments = Comment::where($type . '_id', $id)
             ->latest('created_at')
             ->with('user')
             ->paginate($count);

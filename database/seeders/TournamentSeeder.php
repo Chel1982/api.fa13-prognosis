@@ -16,7 +16,7 @@ class TournamentSeeder extends Seeder
     {
         DB::table('tournaments')->insert([
             'id' => 1,
-            'name' => 'Общий турнир',
+            'name' => 'все турниры',
             'status' => 'all'
         ]);
     }

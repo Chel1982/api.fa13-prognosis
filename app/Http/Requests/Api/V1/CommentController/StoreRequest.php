@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\V1\CommentController;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
@@ -24,7 +25,8 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'game_id' => 'required|integer',
+            'id' => 'required|integer',
+            'type' => ['required', Rule::in(['game', 'tournament'])],
             'comment' => 'required|string|min:2|max:1500'
         ];
     }

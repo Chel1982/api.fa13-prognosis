@@ -46,4 +46,15 @@ class TournamentController extends Controller
 
         return response()->json($tournament, 200);
     }
+
+    /**
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(int $id)
+    {
+        $tournament = Tournament::where('id', $id)->firstOrFail();
+
+        return response()->json($tournament, 200);
+    }
 }
