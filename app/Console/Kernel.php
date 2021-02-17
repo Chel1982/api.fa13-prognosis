@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\PressesParser;
+use App\Console\Commands\RegularsParser;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +15,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        RegularsParser::class,
+        PressesParser::class
     ];
 
     /**
@@ -24,7 +27,21 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command(PressesParser::class, ['schedule'])
+            ->hourly()
+            ->between('4:00', '22:00');
+
+        $schedule->command(PressesParser::class, ['cup'])
+            ->hourly()
+            ->between('4:00', '22:00');
+
+        $schedule->command(RegularsParser::class, ['schedule'])
+            ->wednesdays()
+            ->sundays()
+            ->at('2:00');
+
+        $schedule->command(RegularsParser::class, ['cup'])
+            ->dailyAt('3:00');
     }
 
     /**
