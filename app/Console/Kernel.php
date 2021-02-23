@@ -37,6 +37,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command(RegularsParser::class, ['schedule'])
             ->wednesdays()
+            ->at('2:00');
+
+        $schedule->command(RegularsParser::class, ['schedule'])
             ->sundays()
             ->at('2:00');
 
