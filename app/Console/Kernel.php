@@ -36,12 +36,7 @@ class Kernel extends ConsoleKernel
             ->between('4:00', '22:00');
 
         $schedule->command(RegularsParser::class, ['schedule'])
-            ->wednesdays()
-            ->at('2:00');
-
-        $schedule->command(RegularsParser::class, ['schedule'])
-            ->sundays()
-            ->at('2:00');
+            ->dailyAt('2:00');
 
         $schedule->command(RegularsParser::class, ['cup'])
             ->dailyAt('3:00');
