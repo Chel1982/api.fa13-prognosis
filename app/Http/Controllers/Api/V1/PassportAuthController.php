@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\PassportAuthController\LoginRequest;
 use App\Http\Requests\Api\V1\PassportAuthController\RegisterRequest;
 use App\Models\User;
+use App\Models\UserFa13Email;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -71,11 +72,20 @@ class PassportAuthController extends Controller
      */
     public function register(RegisterRequest $request)
     {
-        $user = User::create([
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'password' => bcrypt($request->get('password'))
-        ]);
+        $user = new User();
+        $user->name = $request->get('name');
+        $user->email = $request->get('email');
+        $user->password = bcrypt($request->get('password'));
+        $user->save();
+
+        $userFa13email = UserFa13Email::where('email', $request->get('email'));
+
+        $checkFa13Email = $userFa13email->exists();
+        if ($checkFa13Email) {
+            $userFa13 = $userFa13email->firstOrFail();
+            $userFa13->user_id = $user->id;
+            $userFa13->save();
+        }
 
         $token = $user->createToken('LaravelAuthApp')->accessToken;
 

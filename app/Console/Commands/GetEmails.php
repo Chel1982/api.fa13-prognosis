@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Team;
 use App\Models\UserFa13Email;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
@@ -22,7 +23,7 @@ class GetEmails extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'get emails fa13';
 
     /**
      * Create a new command instance.
@@ -86,6 +87,8 @@ class GetEmails extends Command
                     }
                     $dom = HtmlDomParser::str_get_html($htmlPage);
 
+                    $teamName = $dom->find('div[class="team-header"] > h1', 0)->plaintext;
+
                     $name = $dom->find('table[class="wide alternated-rows-bg"]', 0)
                         ->find('tr', 1)
                         ->find('a', 0)
@@ -93,12 +96,29 @@ class GetEmails extends Command
 
                     $email = explode(':', $dom->find('a[class="m-s-em"]', 0)->href);
 
-                    $checkEmail = UserFa13Email::where('email', trim($email[1]))->exists();
+                    $userFa13Email = UserFa13Email::where('email', trim($email[1]));
+                    $checkEmail = $userFa13Email->exists();
+
+                    if ($checkEmail) {
+                        $userFa13Email = $userFa13Email->firstOrFail();
+                    }
+
                     if(!$checkEmail) {
                         $userFa13Email = new UserFa13Email();
                         $userFa13Email->name = trim($name);
                         $userFa13Email->email = trim($email[1]);
                         $userFa13Email->save();
+                    }
+
+                    $checkTeam = Team::where([
+                        ['user_fa13_email_id', '=', $userFa13Email->id],
+                        ['name', '=', trim($teamName)]
+                    ])->exists();
+//                    file_put_contents('1.txt', $checkTeam); die();
+                    if (!$checkTeam) {
+                        $team = Team::where('name', trim($teamName))->firstOrFail();
+                        $team->user_fa13_email_id = $userFa13Email->id;
+                        $team->save();
                     }
                 }
             }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\CommentController;
 use App\Http\Controllers\Api\V1\GameController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PassportAuthController;
 use App\Http\Controllers\Api\V1\PressConferenceController;
 use App\Http\Controllers\Api\V1\TournamentController;
@@ -27,6 +28,9 @@ Route::group(['prefix' => '/v1'], function() {
 
     Route::post('comment', [CommentController::class, 'store'])->middleware('auth:api');
     Route::get('comments/type/{type}/id/{id}/count/{count}', [CommentController::class, 'index']);
+
+    Route::get('notifications', [NotificationController::class, 'index'])->middleware('auth:api');
+    Route::put('notifications', [NotificationController::class, 'update'])->middleware('auth:api');
 
     Route::post('login', [PassportAuthController::class, 'login']);
     Route::post('register', [PassportAuthController::class, 'register']);

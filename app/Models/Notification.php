@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserFa13Email extends Model
+class Notification extends Model
 {
     use HasFactory;
 
-    public function user()
+    public function userFrom()
     {
         return $this->belongsTo(User::class);
     }

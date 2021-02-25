@@ -10,4 +10,9 @@ class Team extends Model
     {
         return $this->hasMany(TeamTournament::class);
     }
+
+    public function userFa13email()
+    {
+        return $this->belongsTo(UserFa13Email::class, 'user_fa13_email_id');
+    }
 }
