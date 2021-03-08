@@ -20,7 +20,7 @@ class NotificationController extends Controller
                 ['to_user_id', '=', auth()->user()->getAuthIdentifier()],
                 ['status', '=', self::NEW]
             ])
-            ->with('userFrom')
+            ->with(['userFrom', 'game.tournament'])
             ->get();
 
         return response()->json($notifications, 200);
