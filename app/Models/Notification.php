@@ -11,6 +11,6 @@ class Notification extends Model
 
     public function userFrom()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'from_user_id');
     }
 }
