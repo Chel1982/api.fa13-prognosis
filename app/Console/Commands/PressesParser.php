@@ -10,6 +10,7 @@ use App\Models\Tournament;
 use DateTime;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
+use Illuminate\Support\Facades\Http;
 
 class PressesParser extends Command
 {
@@ -68,7 +69,7 @@ class PressesParser extends Command
             $season->save();
         }
 
-        $html = file_get_contents(self::URL_FA13 . '/tournament/regular');
+        $html = Http::timeout(15)->get(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
 
         if ($sourceChamp === 'cup') {
@@ -92,8 +93,7 @@ class PressesParser extends Command
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/' . $sourceChamp);
-
+            $htmlRegularChamp = Http::timeout(15)->get(self::URL_FA13 . $e->href . '/' . $sourceChamp);
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
             $nameRegularChamp = trim($domRegularChamp->find('h2', 0)->plaintext);
@@ -111,11 +111,9 @@ class PressesParser extends Command
             foreach ($domRegularChamp->find('div[class="col col50"]') as $elRegularChamp) {
 //                sleep(rand(0,3));
                 foreach ($elRegularChamp->find('table[class="alternated-rows-bg wide"] > tr') as $elGame) {
-
 //                    sleep(rand(0,3));
 
                     $th = $elGame->find('th', 0) ? 1 : 0;
-
                     $pressBool = $elGame->find('.l-g-press-release-3', 0) ? 1 : 0;
 
                     if ($th || $pressBool) {
@@ -168,7 +166,8 @@ class PressesParser extends Command
                     }
 
                     $hrefPress = trim($elGame->find('nobr > a', 3)->href);
-                    $pressHtml = file_get_contents(self::URL_FA13 . $hrefPress);
+
+                    $pressHtml = Http::timeout(15)->get(self::URL_FA13 . $hrefPress);
                     $pressDom = HtmlDomParser::str_get_html($pressHtml);
 
                     //для первого или второго менедежера

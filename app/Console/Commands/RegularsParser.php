@@ -13,6 +13,7 @@ use App\Models\VideoSource;
 use DateTime;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
+use Illuminate\Support\Facades\Http;
 
 class RegularsParser extends Command
 {
@@ -73,7 +74,7 @@ class RegularsParser extends Command
             $season->save();
         }
 
-        $html = file_get_contents(self::URL_FA13 . '/tournament/regular');
+        $html = Http::timeout(15)->get(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
 
         if ($sourceChamp === 'cup') {
@@ -97,8 +98,7 @@ class RegularsParser extends Command
 
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/' . $sourceChamp);
-
+            $htmlRegularChamp = Http::timeout(15)->get(self::URL_FA13 . $e->href . '/' . $sourceChamp);
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
             foreach ($domRegularChamp->find('div[class="col col50"]') as $elRegularChamp) {

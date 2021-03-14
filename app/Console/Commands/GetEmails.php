@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\UserFa13Email;
 use Illuminate\Console\Command;
 use KubAT\PhpSimple\HtmlDomParser;
+use Illuminate\Support\Facades\Http;
 
 class GetEmails extends Command
 {
@@ -42,14 +43,14 @@ class GetEmails extends Command
      */
     public function handle()
     {
-        $html = file_get_contents(self::URL_FA13 . '/tournament/regular');
+        $html = Http::timeout(15)->get(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
         $linkToParse = $dom->find('tbody a');
 
         foreach ($linkToParse as $e) {
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
-            $htmlRegularChamp = file_get_contents(self::URL_FA13 . $e->href . '/last');
 
+            $htmlRegularChamp = Http::timeout(15)->get(self::URL_FA13 . $e->href . '/last');
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
             foreach ($domRegularChamp->find('table[class="alternated-rows-bg wide"] > tr > td[class="teams main"]') as $elGame) {
@@ -62,7 +63,8 @@ class GetEmails extends Command
 
                 foreach ($elGame->find('a') as $item) {
 //                    sleep(rand(0,3));
-                    $htmlCommand = file_get_contents(self::URL_FA13 . $item->href);
+
+                    $htmlCommand = Http::timeout(15)->get(self::URL_FA13 . $item->href);
                     $domCommand = HtmlDomParser::str_get_html($htmlCommand);
 
                     $isManager = $domCommand->find('div[class="block-dark"]') ? false : true;
@@ -81,6 +83,7 @@ class GetEmails extends Command
                     $context = stream_context_create($opts);
 
                     try{
+                        //ToDo create request for Guzzle
                         $htmlPage = file_get_contents(self::URL_FA13 . $item->href, false, $context);
                     } catch (\Exception $e) {
                         continue;
