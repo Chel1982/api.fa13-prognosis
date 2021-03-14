@@ -241,6 +241,7 @@ class RegularsParser extends Command
                     if ($scoreFirst !== null && $scoreSecond !== null && $game->status == self::STATUS_NOT_PLAYED) {
                         $game->first_team_score = $scoreFirst;
                         $game->second_team_score = $scoreSecond;
+                        $game->status = self::STATUS_PLAYED;
                         $game->save();
                     }
 
