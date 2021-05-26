@@ -27,19 +27,19 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(PressesParser::class, ['schedule'])
-            ->hourly()
-            ->between('4:00', '22:00');
-
-        $schedule->command(PressesParser::class, ['cup'])
-            ->hourly()
-            ->between('4:00', '22:00');
-
-        $schedule->command(RegularsParser::class, ['schedule'])
-            ->dailyAt('2:00');
-
-        $schedule->command(RegularsParser::class, ['cup'])
-            ->dailyAt('3:00');
+//        $schedule->command(PressesParser::class, ['schedule'])
+//            ->hourly()
+//            ->between('4:00', '22:00');
+//
+//        $schedule->command(PressesParser::class, ['cup'])
+//            ->hourly()
+//            ->between('4:00', '22:00');
+//
+//        $schedule->command(RegularsParser::class, ['schedule'])
+//            ->dailyAt('2:00');
+//
+//        $schedule->command(RegularsParser::class, ['cup'])
+//            ->dailyAt('3:00');
     }
 
     /**
