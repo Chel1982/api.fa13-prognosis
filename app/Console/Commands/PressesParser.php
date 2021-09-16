@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Http;
 class PressesParser extends Command
 {
     const URL_FA13 = 'https://www.fa13.info';
-    const SEASON_NUMBER = 41;
+    const SEASON_NUMBER = 42;
 
     /**
      * The name and signature of the console command.
