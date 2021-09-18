@@ -38,19 +38,20 @@ class GetEmails extends Command
 
     /**
      * Execute the console command.
+     * Перед запуском команды необходимо is_active задать параметр 0
      *
      * @return int
      */
     public function handle()
     {
-        $html = Http::timeout(15)->get(self::URL_FA13 . '/tournament/regular');
+        $html = Http::timeout(30)->get(self::URL_FA13 . '/tournament/regular');
         $dom = HtmlDomParser::str_get_html($html);
         $linkToParse = $dom->find('tbody a');
 
         foreach ($linkToParse as $e) {
             print_r('start work with:' . trim($e->plaintext) . PHP_EOL);
 
-            $htmlRegularChamp = Http::timeout(15)->get(self::URL_FA13 . $e->href . '/last');
+            $htmlRegularChamp = Http::timeout(30)->get(self::URL_FA13 . $e->href . '/last');
             $domRegularChamp = HtmlDomParser::str_get_html($htmlRegularChamp);
 
             foreach ($domRegularChamp->find('table[class="alternated-rows-bg wide"] > tr > td[class="teams main"]') as $elGame) {
@@ -62,7 +63,7 @@ class GetEmails extends Command
                 }
 
                 foreach ($elGame->find('a') as $item) {
-//                    sleep(rand(0,3));
+                    sleep(rand(0,1));
 
                     $htmlCommand = Http::timeout(15)->get(self::URL_FA13 . $item->href);
                     $domCommand = HtmlDomParser::str_get_html($htmlCommand);
@@ -104,12 +105,15 @@ class GetEmails extends Command
 
                     if ($checkEmail) {
                         $userFa13Email = $userFa13Email->firstOrFail();
+                        $userFa13Email->is_active = 1;
+                        $userFa13Email->save();
                     }
 
                     if(!$checkEmail) {
                         $userFa13Email = new UserFa13Email();
                         $userFa13Email->name = trim($name);
                         $userFa13Email->email = trim($email[1]);
+                        $userFa13Email->is_active = 1;
                         $userFa13Email->save();
                     }
 
@@ -117,7 +121,7 @@ class GetEmails extends Command
                         ['user_fa13_email_id', '=', $userFa13Email->id],
                         ['name', '=', trim($teamName)]
                     ])->exists();
-//                    file_put_contents('1.txt', $checkTeam); die();
+
                     if (!$checkTeam) {
                         $team = Team::where('name', trim($teamName))->firstOrFail();
                         $team->user_fa13_email_id = $userFa13Email->id;

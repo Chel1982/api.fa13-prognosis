@@ -18,6 +18,7 @@ class CreateUserFa13EmailsTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->tinyInteger('is_active');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('restrict')->onDelete('restrict');
